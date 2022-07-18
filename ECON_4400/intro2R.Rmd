@@ -1,0 +1,1624 @@
+---
+title: "Introduction to R"
+subtitle: 'Course: ECON 4400'
+author: "By: Tommas Trivieri (email: ttrivier@uwo.ca)"
+date: "`r format(Sys.time(), 'Last updated: %B %d,  %Y')`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Prerequisites
+Welcome to the class. In this document I'll walk you through various examples illustrating basic commands in R. These notes are in large part based on Professor Charles Saunders "**R for Econometrics**" videos, which I highly recommend you watch if you are having a difficult time getting R up and running, and Florian Oswald's online econometric notes. You can access Professor Saunder's videos by visiting his YouTube channel, <https://www.youtube.com/channel/UCVBYrHbwSnqMdQ5HMSliCtQ/playlists>, and online notes by visiting this site <https://scpoecon.github.io/ScPoEconometrics/>. Last, if you are interested in learning more about how I created this document you can visit <http://rmarkdown.rstudio.com>.
+
+To  get started, you'll need to install:
+
+- R - <https://www.r-project.org/>, and
+- RStudio - <https://www.rstudio.com/products/rstudio/>.
+
+Once you are finished with the installation, open RStudio. In the console, type `2+2` and hit enter. If all is well you should see something like the following in your console
+```{r}
+2+2
+```
+
+
+# The basics of the basics
+
+In this section, I'll talk about comments/comment blocks, setting up file directories, installing and loading packages, and getting help by yourself in R. Throughout this section I will be assuming you are working in an R-script.
+
+## Comments and comment blocks
+
+While programming in any language it is often helpful to provide detailed comments within the file that describe the commands you are using and variables you have defined so that it is easy for anyone to replicate and verify your work. Comments are all useful for "commenting out" parts of your code that you don't want to be executed without having to delete the code. For example, imagine I have the following lines of code written in my script,
+```{r}
+1+2+3
+4+5+6
+```
+
+Now suppose I don't want to see output from `4+5+6`, to do this I will need to paste the '#' symbol in front of this line of code, i.e.,
+```{r}
+
+1+2+3
+#4+5+6
+
+```
+if you need to comment multiple lines out at once you can highlight the desired lines of code with your cursor and hit `CTRL + SHIFT + C` (in MacOS I imagine it's `CMD + SHIFT + C`), which yields
+```{r}
+
+# 1+2+3
+# 
+# 4+5+6
+
+```
+
+As noted to earlier, `#` symbol can also be used to write quick notes like the following
+```{r}
+
+# this is a cool comment. I can write anything I want
+
+```
+or even bigger chunks of notes like 
+```{r}
+
+# This is a big chunk of words. 
+# 
+# Sometimes it's helpful to provide more detail in your scripts so others looking 
+# to replicate your work can follow along better.
+# 
+# Other times it's kind of annoying to open a script with too many detailed 
+# comments so think carefully about what you save in your scripts.
+
+```
+
+
+## Setting up your working directory
+
+The `getwd()` will tell you what directory you're currently in. This is important to know because this tells us where we are working and where our work will be saved. For example, 
+```{r}
+getwd()
+```
+If you need to switch to a different directory we can use the `setwd()` and then we can re-run the `getwd()` to check if we actually switched directories. 
+```{r}
+setwd("~/DDrive/Dropbox")
+getwd()
+```
+An even fancier way of setting our working directory involves assiging our filepath as a string to a variable that we'll call "rootdir" 
+```{r}
+rootdir <- "~/DDrive/Dropbox/ECON_4400_GTA_202122" # paste any filepath in between the parantheses
+setwd(rootdir)
+getwd()
+```
+We will talk more about variables and how to define them later on. 
+
+
+## Packages
+
+R comes with a set of installed "base" packages. However, in many cases we will need to install and load other community-developed packages to do analysis in R. Packages are collections of functions and documentation that have been developed by individuals in the R community to improve the functionality of R. For example, one of the most popular packages used to visualize data in R is **ggplot2**, which was developed by Hadley Wickham. 
+
+Before I provide you with a list of recommended packages to make your life easier in this course, let's talk about how to install and load packages. To install an R package we use the `install.packages("name of package")` command. R is a case-sensitive language so make sure don't miss any lower- or upper-case letters in the package name. Thus, if we wanted to install the **ggplot2** package that I mentioned earlier, we would simply execute `install.packages("ggplot2")` in our script or console. If the package was successfully installed it should appear in our user library that can viewed by clicking on the **Packages** tab located at the top of the bottom right panel in RStudio.  No matter the package, you only need to install it once. That said, you will need to load the packages you desire to use each time you begin a new session of R. To load a package after it has been installed, we simply execute `library("name of package")` in our script or console. In our previous example, this would look like `library("ggplot2")`. 
+
+### Recommended packages
+
+- **tidyverse** - this is a collection of R packages that are helpful in working with/cleaning/manipulating/visualizing various kinds of data. The packages all share an underlying grammar and design philosophy. The packages that come with tidyverse include but are not limited to **ggplot2** (data visualization), **dplyr** (data manipulation), **readr** (reading rectangular text data), **tidyr** (data cleaning tools), **forcats** (tools for working with categorical variables), and many more. You can learn more about these packages by visiting <https://www.tidyverse.org/> or working through Hadley Wickham's book that I cited at the beginning of this document.
+- **wooldridge** - this package contains data sets from "Introductory Econometrics: A Modern Approach, 7e" by Jeff M. Wooldridge. I use some of the data from this package later on.
+- For a comprehensive list of basic and advanced packages covering different areas of econometrics you can visit <https://cran.r-project.org/web/views/Econometrics.html>.
+
+## Getting help
+
+Sooner or later you may need help understanding how to use a package or finding a library within a package that will help you answer your research question. Before asking others for help it is usually a good idea to try and help yourself first. While not as straightforward as other programming languages like Stata, R provides quite a bit of package documentation that can be reviewed to help clear up any confusion you may have. The `help()` function and `?` help operator in R provide access to the documentation pages for R functions, data sets, and other objects, both for packages that user created and standard packages that are installed with R. For example, if we needed help with the **ggplot2** package we could execute any of the following commands in our scripts or console: `help(ggplot, package="ggplot2")`, or `help("ggplot2")`, or `help(package="ggplot2")`, or `?ggplot2` or `?"ggplot2"` (i.e., the quotes are optional).
+
+Aside from the standard commands mentioned above, there are hundreds of examples online illustrating how to use R packages that can be accessed via Google. There are also various free online courses and or videos covering numerous topics related to economics like the ones provided by Professor Saunders. Of course, if you are still having trouble you can always contact members of the faculty team or myself for more help. Ideally, you would email one of us with your question ahead of time so we have some time to review it and hopefully find a solution. 
+
+# The basics
+
+In this section I will introduce you to the fundamentals of programming in R. I have borrowed several parts and examples from Florian Oswald's 2nd Year Econometric notes found here, <https://scpoecon.github.io/ScPoEconometrics/R-intro.html#programming-basics>. I highly encourage you to take a look at his notes if you're interesting in seeing different examples of how you can use R.
+
+## Using R for basic calculations
+
+Like other programming languages, R can be used as a calculator. The arithmetic operators in R are
+
+- `+` # addition
+- `-` # subtraction
+- `*` # multiplication
+- `^` # exponentiation
+
+Here are some examples of addition, subtraction, multiplication, and division:
+
+| Code          |   Result   	|
+|:-------------	|:----------	|
+| `2 + 23`  |     25     	|
+| `2 - 23` 	|     21     	|
+| `2 * 23` 	|     46     	|
+| `2 / 23`  | 0.08695652 	|
+| `2 + 23/21 - (4.4+0.9) + 3*4` |  9.795238  	|
+
+Exponents: 
+
+|            Code |   Result   	|
+|:---------------	|:----------	|
+| `2^3`          	|      8     	|
+| `2^(-3)`      	|    0.125   	|
+| `2^(1+2)`       |      8     	|
+| `2^(1-(2/3))`   |  1.259921  	|
+| `2^(1/2)`       | 1.414214   	|
+| `sqrt(2)`      	| 1.414214   	|
+
+Logarithms, $e$, $\pi$, and trigonmetric functions:
+
+|            Code |   Result   	|
+|:---------------	|:----------	|
+| `exp(2)`        | 7.389056    |
+| `pi`      	    | 3.141593   	|
+| `cos(2*pi)`       | 1     	|
+| `sin(pi/2)`     |  1	|
+| `log(exp(1))`   | 1   	|
+| `log(1)`      	| 0  	|
+| `log10(1000)`   | 3 |
+| `log(1000,base=10)` | 3 |
+| `log2(8)`       | 3 |
+
+Try these examples in your console or script to see if you get the same answers or to see if I made any mistakes!
+
+## Objects
+
+In all programming languages variables provide a way for us to access data stored on our computer memory. In R, these data are accessed through data structures referred to as **objects**. Objects can be numbers, vectors, matrices, lists, dataframes as well as other things that are less relevant to these notes. In other words, variables are a name or label for something.
+
+To define a variable in R we can use the `=` or `<-` as follows
+```{r}
+x1 = 2
+x1
+
+x2 <- 2 # equivalent to above
+x2
+
+xx <- 5
+
+x1*xx # With variables, we can do basic calculations as before 
+x2*xx 
+
+50 -> x3 # you can also assigns values to variables like this if you choose to use the '->' operator. This will NOT work with the '=' operator
+x3
+
+y <- "this is a string"
+y
+
+z = function(x){log(x)} # this is a user-defined function that takes a number "x" and returns log("x")
+z(1)
+```
+
+In the above examples we can see that `x1` and `x2` refer to the value 2 and `xx` refers to the value 5. In contrast, instead of referring to a number, `y` refers to a string. Last, `z` is the name of a function that takes some number `x` and returns `log(x)`. Of course, this function is only defined for values of `x > 0`.
+
+As you can see, both `=` or `<-` operators are equivalent for the most part. The main difference between the operators is that the name of the variable can appear on the left or right side of the `<-` operator (provided you switch the position of the arrow, i.e., `"value" -> "name of variable"`), while the name of the variable ***must*** appear on the left side of the `=`. All that said, I think programming purists in the `R` community prefer to use `<-`, when defining variables instead of the `=`, but it doesn't really matter as long as you stay consistent. 
+
+### Removing variables and cleaning up your workspace
+
+Sometimes you'll no longer need variables that you created and want to remove them. To do this we simply use teh `rm("name of variable")` command. For example,
+```{r}
+
+x <- "the variable we dont want"
+print(x)
+
+rm("x") # after this command is executed the variable 'x' should no longer be visible in the Environment section of R studio.
+
+```
+
+### Data types
+
+Even though you probably won't need to explicitly type out the data types you are using while writing your scripts, it's a good idea to know what the main data types are in `R`:
+
+- **Numeric** or 'Double', e.g., `5.0, 1.0, 10000.3` etc.
+- **Integer**, e.g., `1, 2, 100, 10000`
+- **Complex**, e.g., `2.0 + 5.0i`
+- **Logical operators** --- two possible values, `TRUE` or `FALSE`
+    - Can also use `T` or `F` (not recommended)
+    - `NA` is also considered logical operator
+- **Characters**, e.g., `"this is a string", "A", "b", "day/month/year"`
+- Categorical, Discrete, or `Factor` variables:
+    - These are variables that assign character labels to numeric values. 
+    - e.g., `factor(x=c(0,1,2), labels("<=HS", "College", "BA+"))`. `factor` assigns the strings `"<=HS", "College", and "BA+"` to the numeric values `0, 1, and 2`, respectively. 
+
+### Vectors and matrices
+
+A data structure can be two things: homogeneous, i.e., all elements are of the same type, or heterogeneous, i.e., the elements can be more than one type (think of strings and numerics).
+
+|       Dimension |  Homogeneous	| Heterogeneous |
+|:---------------	|:----------	| :------------	 |
+| 1       |      Vector  	| List |
+| 2     	|    Matrix   	| Data Frame |
+
+
+#### Vectors
+
+Here, I'll tell you more about vectors and show you a few different ways to create vectors. So, what is a vector? A vector is a container for objects of identical types.
+
+The most common way to create a vector in `R` is using the `c()` function, which is known as the combine function. As we've seen earlier, we can create a vector with this function by
+```{r}
+c(1,2,3,4,5,6,7)
+```
+As you can see, we have created a vector of numbers between 1 to 7. If we watned to store this vector into a variable called `vector` we would do the following,
+```{r}
+vector = c(1,2,3,4,5,6,7)
+print(vector)
+```
+
+What if we didn't want to type out all those numbers? Well, we can use the `:` operator to create a vector of integers between 1 and 7. That is,
+```{r}
+
+vector_alt = 1:7
+print(vector_alt)
+
+```
+To access specific elemets of this vector we can simply call the name of the vector and input the row number of interest like follows:
+```{r}
+vector[4]
+vector[1:3]
+```
+
+
+If we wanted to create a sequence of numbers that are not integers we would do the following,
+```{r}
+
+vector_alt2 = seq(from = 1.2, to = 10.5, by = 0.5)
+print(vector_alt2)
+
+```
+
+Sometimes we need to repeat a number or character multiple times. To do this, we can use the `rep()` function as follows
+```{r}
+rep("A",times=5)
+```
+We can also use this function to repeat vectors. Let's repeat the vector we called "vector" earlier in this subsection:
+```{r}
+rep(vector,times=4)
+```
+
+Finally, we can apply all the basic arithmetic operations to vectors that were shown earlier. For example, lets apply some basic operations on the vector we called "vector"
+```{r}
+
+vector + 1 # add 1 from each element in the vector
+vector - 1 # subtract 1 from each element in the vector
+vector*10 # multiply each element by 10 in the vector
+vector/10 # divide each element by 10 in the vector
+sqrt(vector) # sqrt each element
+log(vector) # log each element
+vector*10 - vector
+
+```
+#### Matrices
+
+Here, I will tell you more about matrices. Matrices have rows and columns containing the same data type. When dealing with matrices, it is important to understand that the rows and columns are important but this will not be the case for data frames.
+
+We can create a matrix from a vector that's already defined using the `matrix()` function as follows,
+```{r}
+a = 1:15 
+A = matrix(a, nrow = 5 , ncol = 3)
+print(A)
+```
+If we wanted to create a matrix containing the exact same numbers we could do
+```{r}
+B = matrix(1,nrow=5,ncol=3)
+print(B)
+```
+
+If we need to access specific elements of the matrix we can follow a similar procedure as before with vectors and do the following:
+```{r}
+A[1,1] # element in row 1, column 1
+A[1,1:3] # all elements in row 1
+A[1,] # all elements in row 1
+A[1:5,1] # all elements in column 1
+A[,1] # all elements in column 1
+```
+
+We can also create matrices by combing vectors as rows using `rbind()`, or combing vectors as columns using `cbind()`. Let's start by creating two vectors, `x` and `y`
+```{r}
+
+x = 1:10 
+y = rep(2:3,5)
+
+Z1 = rbind(x,y) # combine vectors as rows
+Z1
+
+Z2 = cbind(x,y) # combine vectors as columns
+Z2
+
+```
+We can also customize the column or row names by 
+```{r}
+
+Z3 = cbind(c1=x,c2 = y, c3 = rep(0,10)) # combine vectors as columns and add a column of zeros
+Z3
+
+```
+
+To perform matrix calculations we can recycle matrices A and B from earlier and do the following
+```{r}
+A # remember what's in A
+B # remember what's in B
+A - B # subtract
+B + A # add
+A * B # element-by-element multiplication
+A / B # element-by-element division
+t(B) %*% A # B transposed matrix multiplied A 
+
+```
+
+
+
+# Data
+
+In this section, I will introduce some basic ways to read and write data, familiarize, visualize, and hopefully understand the data you are working with. Similar to previous sections, many of the examples have been borrowed from <https://scpoecon.github.io/ScPoEconometrics/R-intro.html#dataframes>.
+
+## Data frames
+
+Now that we have seen vectors and matrices in `R` we can now move on to examine the most common way that you will interact with data in your projects, which are **data frames**. What is a data frame? A data frame is a list of vectors of the same length. Data frames can contain various data types such as strings, numeric, categorical, and logicals. Put differently, data frames are rectangular collections of variables and observations. To create a data frame from scratch we can use the `data.frame()` functions as well as recycle functions shown before as follows,
+```{r}
+
+  new_dataframe = data.frame( x=10:1,
+                              y = c(rep("Yes",9), "No"), 
+                              z = rep(c(TRUE,FALSE),5) 
+                              )
+  new_dataframe
+```
+Here, we can think of each row as an observation and each row as variable, which is quite similar to a spreadsheet.
+
+If we want to access a aprticular variable in the data frame we use the `$` operator as follows, 
+```{r}
+
+new_dataframe$x # access the entire vector x in the dataframe
+
+```
+If we need to know how many rows or variables we have in the data frame we can use the `nrow()` and `ncol()` functions, respectively
+```{r}
+nrow(new_dataframe)
+ncol(new_dataframe)
+```
+As expected, we have 10 rows and 3 variables in the data frame we created. 
+
+In many cases it will be necessary to save the data frames we created. One way we can do this is to use the `write_csv()` like follows
+```{r}
+datapath <- file.path(rootdir,"data") # the path to the directory where we want to save our data. the first element in file.path is the root directory and the second element is the data folder
+write.csv(new_dataframe,file = file.path(datapath,"new_dataframe.csv"))
+```
+In `write.csv()` the first element, *new_dataframe*, is the data frame we want to save, while the second element tells `R` where to save the file and what to name it. In our case, we named the file "new_dataframe.csv".
+
+To read in this new data frame we saved as a `.csv` we can use the `read.csv()` command in a similar fashion. Let's read this data frame into variable we will call `df1`
+```{r}
+
+df1 <- read.csv(file.path(datapath,"new_dataframe.csv"))
+df1
+
+```
+
+Now that we know how to read and write data frames into `.csv` format, let's work with `mpg`, a more complex data set that comes pre-loaded with `ggplot2` so we can learn some more ways to work with our data. First, let's load in the data by 
+```{r}
+library(ggplot2)
+cars = mpg
+cars
+```
+This is kind of annoying, as it prints the entire data set to the screen. Sometimes we can get a good idea about the data set from looking at the first few observations in the data set. We can look at the first 5 observations by using the `head()` function
+```{r}
+head(cars, n=5 )
+```
+to learn more about the structure of the data, i.e., the names of variables, the types of data contained in the data frame, and the number of observations we can use `str()`
+```{r}
+str(cars)
+```
+As we can see, these data are a mix of numeric, characters, integers, there are 234 observations and 11 variables contained in the data frame. To obtain all the variable names in this data frame we can use the `names()` command 
+```{r}
+names(cars)
+```
+
+What if we wanted to look at the number of cylinders and weights of cars with mpg > 20? We can subset the data frame in a way similar to how we accessed elements in matrices, that is
+```{r}
+cars[cars$hwy > 24, c("cyl","class")]
+```
+Or we could look at the opposite case, 
+```{r}
+cars[cars$hwy <= 24, c("cyl","class")]
+```
+What can we learn from this exercise? Less fuel efficient cars tend to be larger and have a greater number of cylinders than fuel efficient cars.
+
+## Summary statistics
+
+Still working with the **mpg** data set, let's see how we could compute some basic summary statistics of our data
+```{r}
+summary(cars)
+```
+As you can see, the `summary()` command prints summary statistics for each variable in our data frame we called "cars". if we only want summary statistics for a few variables we could specify them as follows
+```{r}
+summary(cars$cty)
+summary(cars$hwy)
+```
+If we needed to know the variance, standard deviation, or inter-quartile range of any of our variables we could 
+```{r}
+var(cars$cty)
+sd(cars$cty)
+IQR(cars$cty)
+```
+
+What if we wanted to tabulate or cross-tabulate our data? One way to go about this is to use the `table()` function along with `prop.table()` 
+```{r}
+
+mytab <- table(cars$class,cars$cyl)
+mytab # frequencies
+prop.table(mytab) # cell percentages
+prop.table(mytab,1) # row percentages
+prop.table(mytab,2) # column percentages
+
+```
+
+## Plotting 
+
+In this subsection I'll introduce you to plotting with the `ggplot2` package. The examples I'll cover will involve histogram, bar plots, and scatter plots. There many other plot types available with this package and I encourage you to read up on them if you are interested (here are two useful sites to check out: <https://www.rdocumentation.org/packages/ggplot2/versions/3.3.5> and <https://r4ds.had.co.nz/data-visualisation.html>). Many of the examples shown below are lifted from the free online **R for Data Science** book written by Hadley Wickham (the latter link in parenthesis). 
+
+In general, we can follow a basic template for making graphs with `ggplo2` that looks like
+`ggplot(data = <DATA>) + `
+  `<GEOM_FUNCTION>(mapping = aes(<MAPPINGS>))`. In all cases, we must tell ggplot what data frame we are using, the type of graph we want to create (`<GEOM_FUNCTION>`), and we must supply the variables we want mapped into the axes by inputting the variables in the `<MAPPINGS>` part of the aes function.
+  
+Now that we have a basic template for constructing figures with `ggplot2`, let's create a basic scatter plot using the **mpg** data we've been using throughout this notebook.
+
+### Scatterplots
+
+Let's visually explore the relationship between engine size (`mpg$displ`) and and highway fuel efficiency (`mpg$hwy`) in a scatter plot using our basic template:
+```{r}
+cars <- mpg
+ggplot(data = cars) + 
+  geom_point(mapping = aes(x = displ, y = hwy))
+
+```
+
+As you can see, there is negative relationship between a car's engine size and highway fuel efficiency, as you would expect. Let's modify this figure by chagning the color of the points to blue and the markers to diamonds
+
+```{r}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy), color = "blue", shape=23)
+```
+
+What if we wanted to explore the relationship between fuel efficiency and engine size by car class? One way to do this would be to use the following code 
+
+```{r}
+
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy, color = class))
+
+```
+
+Here, we are telling `ggplot2` to color the points by the car class. Notice, that we placed the color option within `aes()` instead of outside of it like before. Pretty cool! Finally, let's fix our figure by adding titles to it
+
+```{r}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy,color = class), 
+             shape=23) +
+             ggtitle("Engine Size vs. Highway Fuel Efficiency") +
+             theme(plot.title = element_text(hjust = 0.5)) + # center the title
+             xlab("Engine Displacement") +
+             ylab("Miles Per Gallon (Highway)")
+```
+
+Now, let's add a geometric objects to this basic figure
+
+```{r}
+
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy)) +
+  geom_smooth(mapping = aes(x = displ, y = hwy)) +
+    ggtitle("Engine Size vs. Highway Fuel Efficiency") +
+             theme(plot.title = element_text(hjust = 0.5)) + # center the title
+             xlab("Engine Displacement") +
+             ylab("Miles Per Gallon (Highway)")
+
+
+# Just line
+ggplot(data = mpg) + 
+  geom_smooth(mapping = aes(x = displ, y = hwy)) +
+    ggtitle("Engine Size vs. Highway Fuel Efficiency") +
+             theme(plot.title = element_text(hjust = 0.5)) + # center the title
+             xlab("Engine Displacement") +
+             ylab("Miles Per Gallon (Highway)")
+
+```
+
+We can also add smoothed lines by different groups. Let's try this with drive type:
+
+```{r}
+
+# Just lines
+ggplot(data = mpg) +
+  geom_smooth(mapping = aes(x = displ, y = hwy, group = drv), show.legend = TRUE) +
+    ggtitle("Engine Size vs. Highway Fuel Efficiency") +
+             theme(plot.title = element_text(hjust = 0.5)) + # center the title
+             xlab("Engine Displacement") +
+             ylab("Miles Per Gallon (Highway)")
+
+```
+
+
+Keep in mind, these examples barely scratch the surface of the figures you can create with `ggplot2` but for the sake of brevity we must move on to other plot types.
+
+### Histograms
+
+Still using the the **mpg** data, let's visualize the distribution of highway fuel efficiency.
+
+```{r}
+
+# plain histogram
+ggplot(mpg, aes(x=hwy)) + geom_histogram()
+
+# Change the width of bins
+ggplot(mpg, aes(x=hwy)) + geom_histogram(binwidth=1)
+
+# Change colors
+ggplot(mpg, aes(x=hwy)) + geom_histogram(color="black", fill="white")
+
+# Add mean line
+ggplot(mpg, aes(x=hwy)) + 
+          geom_histogram(color="black", fill="white") +
+          geom_vline(aes(xintercept=mean(hwy)),
+                                     color="blue", 
+                                     linetype="dashed", 
+                                     size=1)
+
+# Histogram with density plot
+ggplot(mpg, aes(x=hwy)) + 
+ geom_histogram(aes(y=..density..), colour="black", fill="white")+
+ geom_density(alpha=.2, fill="#FF6666") 
+
+# Change histogram plot line colors by front-, rear-, and four-wheel drive types
+ggplot(mpg, aes(x=hwy, color=drv)) + geom_histogram(fill="white")
+
+# Overlaid histograms
+ggplot(mpg, aes(x=hwy, color=drv)) +
+  geom_histogram(fill="white", alpha=0.5, position="identity", binwidth = 2.5)
+
+```
+
+Hopefully, this should give you a good idea of how to create histograms with the `ggplot2` package. If you want to learn more you should definitely try to experiment with the code above. 
+
+### Barplots
+
+In this subsection, let's shift gears and use the **diamond** data set that comes loaded with `ggplot2`. The **diamonds** data set contains information about the prices and characteristics of diamonds. Let's start by creating a bar chart that displays the number of diamonds available by diamond quality.
+
+```{r}
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut))
+```
+
+We can further customize this plot by doing
+
+```{r}
+
+# different exeterior colors
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, colour = cut))
+
+# different fill colors
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = cut))
+
+# incorporating more info about diamond clarity
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = clarity))
+
+# position = "dodge" places overlapping objects directly beside one another. This makes it easier to compare individual values.
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = clarity), position = "dodge")
+
+```
+
+
+# Regression
+
+In this section, I'll show you how to run basic regressions in R. We'll start by examining linear regression examples, then we'll move on to multiple regression with continuous and discrete variables.  
+
+## Linear regression
+
+Let's load the `wooldridge` package so we can read in some wage data collected in the 1976 CPS in the US. Naturally, let's see if there is a relationship between years of education and hourly wages. We'll treat wages as our outcome variable and years of education as our independent variable. 
+
+```{r}
+library(wooldridge) # load package
+data("wage1", package = "wooldridge") # read in the data
+
+str(wage1) # getting a feel for the data
+
+summary(wage1) # summarize the data
+
+reg0 <- lm(formula = wage ~ educ, data = wage1) # run our regression
+summary(reg0) # print the results
+
+```
+
+To understand the relationship between wages and years of education the *educ* coefficient is the main item of interest. It tells us that each additional year of education increases hourly wages by 54 cents. this coefficient is statistically significant far beyond the 1 percent level. The table also tells us that a worker with zero years of education can expect a wage of -0.9 dollars per hour. We can also make predictions of one's wage using the coefficients in the table. For example, the predicted hourly wage for someone with 20 years of education would be `-0.9 + 0.541 * 20 = 9.92` dollars/h. Overall, this regression doesn't explain much of the variation in hourly wages, the $R^{2}$ is only around 16%.
+
+## Multiple regression
+
+Extending our example from the previous subsection to multiple regression is quite straightforward. We simply add regressors to our `lm()` command. For example, let's add years of experience to our previous regression
+
+```{r}
+
+reg1 <- lm(formula = wage ~ educ + exper, data = wage1) # run our regression
+summary(reg1) # print the results
+
+```
+All three coefficients are statistically significant. All else equal, each additional year of education is associated with a 64 cent increase in hourly wages. All else equal, we can also see that each additional year of job experience is associated with a 7 cent increase in hourly wages. Finally, the expected hourly wage for someone with zero years of experience and zero years of education is -3.4 dollars/h --- not so good.
+
+### Categorical variables and interactions
+
+Often times we will encounter binary and or categorical variables in our data set that we want to use in our regressions. For example, the married variable in our data set is a binary variable that is equal to 1 if a person is married and zero otherwise. We also have another binary variable in the data set that is called "female" and is equal to one when the person is female and zero otherwise. Finally, we also have a variable called "numdep", which we can consider to be categorical and tells us how many dependents are in each persons household. How do we use these kinds of variables in regressions? The first thing to do is to tell `R` that the variable we are interested is a *factor* variable then include it in the `lm()` function like any continuos variable
+```{r}
+
+wage1$female = as.factor(wage1$female) # converts to 0-1 factor
+wage1$numdep = as.factor(wage1$numdep) # converts to 6 level factor variable
+
+reg2 <- lm(formula = wage ~ educ + exper + female + numdep, data = wage1) # run our regression
+summary(reg2) # print the results
+
+```
+As you can see, once we tell `R` which variables are binary or categorical, it automatically omits one one of the levels such that we don't have any perfect collinearity. Specifically, the reference category for female is being a male, and the reference category for the number o dependents is having no dependents in the household. 
+
+It's well documented that wage-experience profiles exhibit a concave shape. We can account for this by including experience interactions in our model by using the `I()` function. For example, 
+```{r}
+
+reg3 <- lm(formula = wage ~ educ + exper + I(exper^2), data = wage1) # run our regression
+summary(reg3) # print the results
+
+```
+This regression tells us that hourly wages increase with years of experience at a decreasing rate.
+
+What about dummy-dummy interactions? Here's how you could include interactions between gender and marriage status:
+```{r}
+
+wage1$female = as.factor(wage1$female) # converts to 0-1 factor
+wage1$married = as.factor(wage1$married) # converts to 0-1 factor
+
+reg4 <- lm(formula = wage ~ educ + exper + married + female + female*married , data = wage1) # run our regression
+summary(reg4) # print the results
+
+```
+
+Finally, what about dummy-continuous variable interactions? Here's how you could include interactions between gender and years of education:
+```{r message=FALSE}
+
+reg5 <- lm(formula = wage ~ educ + exper + female + female*educ , data = wage1) # run our regression
+summary(reg5) # print the results
+
+```
+Thus, the returns to an additional year of education are lower for women relative to men, but this effect is not statistically significant at conventional levels. 
+
+# Panel data methods
+
+In this section, I will briefly discuss some basic panel data concepts. I will also discuss how to implement the some common estimators economists use when working with panel data. Specifically, I'll cover `Pooled OLS (POLS)` and `Fixed Effects (FE)`, where I'll cover how to estimate fixed effect regressions using the `Dummy Variable` approach, the `Within-Transformed` approach, and a more professional approach with user-created packages. I'll also briefly discuss `Two-Way Fixed Effects` as this may be applicable to some projects in the class and will also serve as a nice pre-cursor to `Difference-in-Difference (DiD)`. The section will conclude with an example of how to implement the `(DiD)` estimator. 
+
+Importantly, the main examples I go through in this section were largely based on the ones used in Nick Huntington-Klein's book titled, "**The Effect**", which he has made freely available here <https://theeffectbook.net/>. If you are looking for a gentle introduction into some popular empirical microeconometric methods used throughout economics, then you should check out his book.
+
+## Basic concepts
+
+What is a "panel data set"? By "panel data", I mean a data set that contains the same unit over more than one time period. The units I am referring to can be individuals, firms, countries, provinces/states, cities, or schools. As an example, panel data sets can contain `N` firms over `T` years, which would mean there are `N*T` firm-year observations in the data set. Alternatively, panel data sets could also contain `N` workers over `T` months, which would mean there are `N*T` worker-month observations in the data set. Hopefully, you get the idea.
+
+When working with panel data it is important to know whether you have a `Balanced Panel` or an `Unbalanced Panel`. A `Balanced Panel` refers to the situation where you observe every unit (`N`) in each time period (`T`). If some units are not observed in some time periods, then you have an `Unbalanced Panel`. In general, it's most common to encounter unbalanced panels. 
+
+Why would there be missing units in some time periods? This can happen for a variety of reasons. Imagine you have access to a large representative survey that follows a group of workers over time. Some of these workers may die unexpectedly, some may not have time to complete the survey in some time periods, or some may just randomly drop in and out for no reason. It could also be due to survey design, e.g., some workers get surveyed the first half of the T survey years, while another group of workers gets surveyed the second half of the T survey years. In practice, it's a good idea to try and figure why the data set has missing observations in some time periods so you can better understand the sample you are working with.  
+
+The other main concepts you'll need to know when working with panel data are the difference between **Within Variation** and **Between Variation**. **Within Variation** typically refers to variation of a variable that happens *within* a unit (e.g., within individuals, workers, firms, or schools, etc.) across different time periods. **Between Variation** typically refers to variation of a variable *between* different units, which is usually in the same time period or comparing over-time averages across units. For example, let's imagine you are a respondent in the representative longitudinal survey of workers I mentioned earlier and the survey tracks hourly wages. The fact that you have a higher hourly wage relative to other respondents in the sample is **Between Variation**, while comparing *your* hourly wage last year to this year would be **Within Variation**. 
+
+## Pooled OLS
+Now that we have some panel data basic concepts under our belts let's start working through some examples of how we can implement panel data estimators. Let's start by reading some crime data from the `Wooldridge` package. This is a balanced panel data set that contains crime data in various US counties between the years 1981--1987. It has 630 observations and 59 variables. For this exercise, we will be interested in estimating the effect of the probability of arrest on the crime rate. 
+
+```{r message=FALSE}
+library(jtools) # tools for summarizing output
+library(huxtable) # tools for summarizing output
+library(wooldridge) # for data
+library(dplyr) # for data cleaning/manipulation
+library(ggplot2) # for plots
+library(estimatr) # package to easily obtain proper standard errors for pooled OLS estimator
+library(lmtest)
+
+data("crime4",package = "wooldridge")
+crime4 %>%
+  filter(year == 81 | year == 82 | year == 83) %>% # only show years 1981--1983
+  arrange(county,year) %>% # sort by county year
+  select(county, year, crmrte, prbarr) %>% # only show these variables
+  rename(County = county,
+         CrimeRate = crmrte,
+         ProbofArrest = prbarr) %>%
+  slice(1:12) %>%
+  knitr::kable(align = "ccc") # center the column variables
+
+```
+
+In this data set, the unit (N) that we observe over more than one time period is `county` and the frequency of time (T) is a year. That is, we observe N counties over T years. Now let's start by ignoring the panel structure of the data set and treat each observation independent over time so we can estimate the relationship between crime rates and the probability of arrest for counties: 1,3,23, and 145. We'll estimate the effect using the Pooled OLS estimator and also plot the line of best fit through the data.
+```{r message=FALSE}
+
+css = crime4 %>% 
+  filter(county %in% c(1,3,145, 23))  # only keep these four counties 
+
+ggplot(css,aes(x =  prbarr, y = crmrte)) + # plot the regression line on four counties
+  geom_point(mapping = aes(x = prbarr, y = crmrte, color = factor(county))) + 
+  geom_smooth(method="lm",se=FALSE) + 
+  theme_bw() +
+  labs(x = 'Probability of Arrest', y = 'Crime Rate', color = "County")
+
+```
+
+By inspecting the figure we can see the `Pooled OLS` estimator suggests there is a strong positive relationship between the crime rate and the probability of arrest. That is, counties with higher arrest rates have higher crime rates. 
+
+Now, let's actually look at two ways we can obtain the estimated effect using the `Pooled OLS` estimator. Both ways will produce the same estimated effects but the the second way will produce the correct standard errors on the estimates. The first approach simply uses the `lm()` function to estimate the regression, while the second approach involves loading the `estimatr` package and using the `lm_robust()` command to obtain the proper standard errors. What's wrong with the standard errors in the first approach? Well, the first approach treats every observation as independent, which leads to much smaller standard errors on the estimated effects. This is because our data is correlated at the county level and therefore are not truly independent. Once we account for the clustered structure in the residuals, our standard errors become much larger and the estimated effect of the probability of arrest on crime rates are no longer significant at conventional levels.
+
+```{r message=FALSE}
+pols_bSE <- lm(crmrte ~ prbarr,data=css)
+pols_gSE<- lm_robust(crmrte ~ prbarr,
+                     se_type = "stata", # cluster-robust standard errors
+                     clusters = county, # we are going to cluster at the county level
+                     data = css)
+
+export_summs(pols_bSE,pols_gSE, coefs = c('prbarr'), model.names = c("Bad S.E.", "Good S.E."), digits =2, stars = c(`***` = 0.01, `**` = 0.05, `*` = 0.1)) # print results to nice table
+
+```
+
+In general, the regressions suggests that a 10 percentage point increase in the probability of arrest leads to a `0.1*0.064801 = 0.0064801` percentage point increase in the crime rate. Does that make sense or are we missing something here? If the chance of getting arrested is high, wouldn't that make individuals less likely to commit crimes? That's certainly what I think should be the case.
+
+Before we get into how to estimate the true effect using the `FE` estimator, let's think more about what the `Pooled OLS` estimator is actually doing here with some graphs. We'll start by plotting the average probability of arrest within each county. The differences in these averages across counties is the **Between Variation** I mentioned in the previous section. As already noted, we can see that *between* counties there is a strong positive relationship between the crime rate and the probability of arrest.
+
+```{r message=FALSE}
+css %>% 
+  filter(prbarr < .5) %>%
+  group_by(county) %>%
+  mutate(label = case_when(
+    crmrte == max(crmrte) ~ paste('County',county),
+    TRUE ~ NA_character_
+  ),
+  mcrm = mean(crmrte),
+  mpr = mean(prbarr)) %>%
+  ggplot(aes(x =  prbarr, y = crmrte, color = factor(county), label = label)) + 
+  geom_point() + 
+  geom_text(hjust = -.1, size = 14/.pt) + 
+  labs(x = 'Probability of Arrest', 
+       y = 'Crime Rate') + 
+  guides(color = "none", label = "none") + 
+  scale_color_manual(values = c('black','blue','red','purple')) + 
+  geom_point(aes(x = mpr, y = mcrm), size = 20, shape = 3, color = 'darkorange') + 
+  annotate(geom = 'text', x = .3, y = .02, label = 'Means Within Each County', color = 'darkorange', size = 14/.pt)
+```
+
+
+```{r message=FALSE}
+
+css %>% 
+  filter(prbarr < .5) %>%
+  group_by(county) %>%
+  mutate(label = case_when(
+    crmrte == max(crmrte) ~ paste('County',county),
+    TRUE ~ NA_character_
+  ),
+  mcrm = mean(crmrte),
+  mpr = mean(prbarr)) %>%
+  ggplot(aes(x =  prbarr, y = crmrte, color = factor(county), label = label)) + 
+  labs(x = 'Probability of Arrest', 
+       y = 'Crime Rate') + 
+  guides(color = "none", label = "none")  + 
+  scale_color_manual(values = c('black','blue','red','purple')) + 
+  geom_point(aes(x = mpr, y = mcrm), size = 20, shape = 3, color = 'darkorange') + 
+  geom_smooth(aes(color = NULL), method = 'lm', se = FALSE)+
+  annotate(geom = 'text', x = .3, y = .02, label = 'OLS Fit on These Four Points', color = 'blue', size = 14/.pt)
+
+```
+
+
+By treating the data set like a big cross-section we can see that the `POLS` estimator is simply recovering the *between* county variation. That is, it fits the regression line through the county level averages of the probability of arrest. 
+
+## Fixed effects
+
+In general, we are interested in estimating, $y_{it} = \alpha_i + \beta x_{it} + u_{it}$, where $\alpha_i$ is the fixed effect or unobserved effect that varies across individuals but not over time, $x_{it}$ is our independent regressor that varies over time and across individuals, and $u_{it}$ is the error term that varies across individuals and over time. If we do not control for the fixed effect our estimate of $\beta$ is going to be biased. 
+
+Now, going back to our example, let's try to think about factors that might impact the crime rate in county *i*. You could imagine there are local factors like geography, the quality of schools, infrastructure, that is, things that do not change very much year-to-year within the county but there is likely variation across counties. So, not very much *within*-variation but a lot of *between*-variation. Similarly, culture, politics, and law and order may impact county level crime rates and also have little *within*-variation. Moreover, things like police budgets surely impact the crime rate and likely vary year-to-year and across counties. So, if we could find a way to remove all the *between*-variation we may have a shot at recovering the true effect of the probability of arrest on crime rates. Put differently, if all the endogeneity can be controlled for/only varies *between*-individuals, we can focus on the *within*-variation to identify the effects of interest. In essence, this is what the `Fixed Effect (FE)` estimator is doing. It removes all the *between*-unit level variation causing the omitted variable bias and leaves us with only *within*-unit level variation. In our case, by controlling for county fixed effects, the `FE` estimator will remove all the local factors, politics, culture, and law and order that vary across counties/also determine things like the police budget, and leaves us with only *within*-county variation.  
+
+In practice, how can we do this? There are two ways we could go about this. The first way would be to follow the `Dummy Variable` approach, where we would estimate the linear model controlling for county level dummies. The second approach is the `Within-transformation` method, where you regress the demeaned outcome variable against the demeaned independent variables. We'll discuss this in more detail when we get there. 
+
+### Dummy variable method
+
+To implement the dummy variable method we can do the following:
+```{r message=FALSE}
+
+lsdv <- lm(crmrte ~ prbarr + factor(county), data = css)
+export_summs(pols_gSE,lsdv, coefs = c('prbarr'),model.names=c("POLS","DV Method"), digits = 2, stars = c(`***` = 0.01, `**` = 0.05, `*` = 0.1))
+
+```
+
+As you can see, the effect of the probability of getting arrested on the crime rate is now negative instead of positive like it was in `POLS`. How do we interpret this effect? Given that this is within-county variation, the interpretation is the following, *comparing a county in year t with an arrest probability 100 percentage points higher than it is in year t+1, we can expect the crime rate to fall by around 3 percentage points in that same county*. Graphically speaking, this looks like the following:
+
+```{r message=FALSE}
+
+css %>%
+  ungroup() %>%
+  mutate(pred = predict(lsdv)) %>%
+  group_by(county) %>%
+  mutate(label = case_when(
+    crmrte == max(crmrte) ~ paste('County',county),
+    TRUE ~ NA_character_
+  )) %>%
+  ggplot(aes(x =  prbarr, y = crmrte, color = factor(county), label = label)) + 
+  geom_point() + 
+  geom_text(hjust = -.1, size = 14/.pt) + 
+  geom_line(aes(y = pred, group = county), color = 'blue') +
+  labs(x = 'Probability of Arrest', 
+       y = 'Crime Rate') + 
+  #scale_x_continuous(limits = c(.15, 2.5)) + 
+  guides(color = "none", label = "none") + 
+  scale_color_manual(values = c('black','green','red','purple'))
+
+```
+
+We can see there is a negative relationship within each county and each county has it's own unique intercept. 
+
+### Within transformation
+
+While convenient, the `Dummy Variable (DV)` method can become computationally expesnive very quickly as the sample size grows. Instead of 4 counties, imagine we had 20,000, that would mean we would have to control for 19,999 dummy variables in the regression. Instead of the `DV` method, many leverage the `Within transformation` approach, which produces the exact same estimate of $\beta$ that the `DV` method obtains. To implement this method, we do the following steps:
+
+- for all variables compute the time average for each unit *i*. In our example this means we compute $\bar{\alpha}_i = \alpha_i$, $\bar{x}_i = \frac{1}{T} \sum^T_{t=1} x_{it}$, and $\bar{y}_i = \frac{1}{T} \sum^T_{t=1} y_{it}$.
+- for each observation, subtract the time averaged variables from the actual value, i.e., $\ddot{x}_{it} = (x_{it} - \bar{x}_i)$,  $\ddot{y}_{it} = (y_{it} - \bar{y}_i)$, and  $\ddot{\alpha}_{i} = 0$ (fixed effects do not vary over time, only across individuals)
+- regress $\ddot{y}_{it}$ on $\ddot{x}_{it}$ 
+
+Let's try these steps out and compare our results the `DV` method:
+```{r message=FALSE}
+
+cdata <- css %>%
+  group_by(county) %>%
+  mutate(mean_crime = mean(crmrte), # mean y
+         mean_prob = mean(prbarr)) %>% # mean x
+  mutate(demeaned_crime = crmrte - mean_crime, # demeaned y
+         demeaned_prob = prbarr - mean_prob) # demeaned x
+
+within <- lm(demeaned_crime ~ demeaned_prob, data = cdata)
+export_summs(pols_gSE,lsdv,within, coefs = c('prbarr','demeaned_prob'),model.names=c("POLS","DV Method","Within Method"), digits = 2, stars = c(`***` = 0.01, `**` = 0.05, `*` = 0.1))
+
+```
+As you can see, the effect of the probability of arrest on the crime rate is the exact same across the `DV` and `Within transformation` method. The interpretation of the coefficient is also the same. That said, when examining the $R^2$ in the `DV` and `Within transformation` regressions, you should be **very careful** when interpreting/comparing the $R^2$ as they are inherently measuring two different things. First, recall that the $R^2$ is a measure based on how much variation there is in our residuals relative to our dependent variable. The $R^2$ in the `DV` method tells us how much variation there is in the residuals relative to all the variation in the crime rate and counts the parts of the crime rate explained by between variation in our county level dummies. The $R^2$ in the `Within transformation` method tells us how much variation there is in the residuals relative to the *within* variation of the crime rate, not the *overall* variation in the crime rate, hence why this measure is often called the *within* $R^2$. In other words, demeaning takes the part explained by the fixed effects out, while the DV method does it *in* the regression.
+
+Plotting the within transformed variables with a regression line demonstrates what the `within` Fixed Effect estimator is doing.
+
+```{r message=FALSE}
+cdata %>%
+  ungroup() %>%
+  mutate(pred = predict(within)) %>%
+  group_by(county) %>%
+  mutate(label = case_when(
+    demeaned_crime == max(demeaned_crime) ~ paste('County',county),
+    TRUE ~ NA_character_
+  )) %>%
+  ggplot(aes(x =  demeaned_prob, y = demeaned_crime, color = factor(county), label = label)) + 
+  geom_point() + 
+  geom_text(hjust = -.1, size = 14/.pt) + 
+  geom_line(aes(y = pred, group = county), color = 'blue') +
+  labs(x = 'Within Probability of Arrest', 
+       y = 'Within Crime Rate') + 
+  #scale_x_continuous(limits = c(.15, 2.5)) + 
+  guides(color = "none", label = "none") + 
+  scale_color_manual(values = c('black','green','red','purple'))
+```
+
+### Fixed Effects with user-defined packages
+
+In practice, most researchers do not manually implement the fixed effect estimators we have been discussing, they usually turn to well regarded user-defined packages. The package I will use today is `fixest` as it tends to be the fastest. Let's see how it works
+
+```{r message=FALSE}
+
+library(fixest)
+
+upFE <- feols(crmrte ~ prbarr | county, css) # feols( y ~ x's | fixed effect variable, data)
+export_summs(pols_gSE,lsdv,within, upFE, coefs = c('prbarr','demeaned_prob'),model.names=c("POLS","DV Method","Within Method","User-Package: fixest"), digits = 2, stars = c(`***` = 0.01, `**` = 0.05, `*` = 0.1))
+
+```
+As we expected, the estimates from the `feols()` package are the exact same as the estimates we obtained using the earlier methods. 
+
+### Multiple sets of fixed effects 
+
+So far, we've seen how fixed effects methods allow us to identify variation that occurs *within* a variable. In our example, we had county fixed effects, so we were comparing the probability of arrest within a county to the same county over time. What if we had access to more than one set of fixed effects?  If we had multiple sets, how could we use them? If we had access to more than one set of fixed effects we could use them by simply controlling for them in a regression. For instance, in the crime data set we've been using, we observe the same counties in multiple years so in practice we could include both county and year fixed effects in the regressions we've been working with so far. 
+
+In general, these specification are often called `Two-way fixed effect (TWFE)` models and often take the form, 
+\begin{aligned}
+Y_{it} = \alpha_i + \beta_1 X_{it} + \delta_t + \epsilon_{it}.
+\end{aligned}
+When working with these models our interpretation will slightly change. Going back to our example, now, we are working with variation *within* a county and *within* a year. So, the variation that's left can be thought of relative to what we would expect *given* the county, and *given* that year. As you can imagine, the interpretation can become a lot trickier with the addition of more fixed effects and can be tricky in general because the year effects can effect the individual effects and vice versa.
+
+In practice, this model can be estimated using the same user-defined package as before:
+```{r}
+
+twFE <- feols(crmrte ~ prbarr | county + year, data = css)
+export_summs(twFE, coefs = c('prbarr'),model.names=c("Two-way FE"), statistics = c(N = "nobs", R2 = "r.squared"), stars = c(`***` = 0.01, `**` = 0.05, `*` = 0.1), digits = 2)
+
+```
+Keep in mind that `feols()` will cluster the standard errors on the first listed fixed effect variable in the regression by default. In our case, that's county.
+
+It's also possible to include additional fixed effects that are not related to time. For example, you could have fixed effects for workers and for county, which are both unrelated to time. However, in this example it should be noted that you are isolating variation *within* a worker and *within* a county, which means in order for you to have any variation to be included, you would need to observe workers showing up in multiple counties. That is, the treatment effect would only depend on workers who switched counties over time. The treatment effect would not be based on workers who never switch counties over time. So, be careful.
+
+
+## Difference-in-Differences
+
+Now that we have a basic understanding of two-way fixed effects, it should be fairly straightforward to understand `Difference-in-Differences (DID)` estimators. In `DID` there is a control (or comparison or untreated) group and a treated group. For `DID` to work, we need some kind of treatment that goes into effect at some point in time, and a group that receives said treatment and a group that does not. Ideally, the treated and untreated groups would be somewhat similar prior to the treatment coming into effect, but this isn't a mandatory requirement for things to work. Then, by isolating and then comparing the *within* variation in both the treated and untreated groups we can determine *how much more the treated group changed compared to the untreated group when going from before to after*.
+
+Okay, now how can we do this in practice? Well since we need to control for both group and time differences, we can simply use the `Two-Way Fixed Effects (TWFE)` estimator! That is, we can adapt the `TWFE` from the previous subsection,
+\begin{aligned}
+Y_{it} = \beta_0 + \beta_1 After_t +  \beta_2 Treated_i + \beta_3 After_t \times Treated_i + \varepsilon_{it},
+\end{aligned}
+where $Treated_i$ is dummy that indicates whether an individual belongs to the treatment group and $After_t$ is a dummy that indicates the post-treatment period. How can we interpret the coefficients?
+
+- $\beta_0$ -- the untreated before mean, i.e., $Treated_i = 0 \ \text{and} \ After_t = 0$
+- $\beta_1$ -- the difference between the before and after for the untreated group
+- $\beta_2$ -- the difference between the treated and the untreated group before the treatment takes effect
+- $\beta_3$ -- how much bigger the before-after difference is for the treated group compared to the untreated group or how much bigger the treated/untreated gap grows after the treatment comes into effect. This is the coefficient of interest for `DID`!
+
+This equation is commonly referred to as the `Two-Way Fixed Effect Difference-in-Differences (TWFE DID)` estimator since it has both group and time fixed effects. Moreover, this method is extremely popular because it can be easily estimated with simple OLS, just make sure you cluster the standard errors at the group level. If you do not, you will fail to account for the fact that the standard errors are likely correlated within groups over time and this will lead to over-precise standard errors. 
+
+Equivalently, you could also estimate this equation to obtain the exact same result:
+\begin{aligned}
+y = \alpha_g + \delta_t +  \gamma_1 Treated + e,
+\end{aligned}
+where $\alpha_g$ is a group fixed effect, e.g., often just "treated" or "untreated", $\delta_t$ is time fixed effect, e.g., often just "before treatment" and "after treatment", and $Treated$ is an indicator equal to one if you are in the treated group during the post-treatment period. Here, $\gamma_1$ = $\beta_3$, i.e., it's our `DID` effect. 
+
+#### Earned Income Tax Credit Example
+
+Let's go through a quick example now. We'll start by reading in a data set that contains information on US single women across various states in 1991--1996. The data also has information on how many children are in the household, the work status of the women, race, earnings, age, years of education, and other stuff. Let's look at it below
+
+```{r}
+
+dfeitc <- read.csv('http://nickchk.com/eitc.csv') 
+
+head(dfeitc) 
+summary(dfeitc)
+
+```
+
+
+In 1993, President Clinton Signed Into Law the Largest EITC Expansion Ever. The President's policy provided a tax cut for 15 million working families. For every dollar a very low-income working parent with one child earns, the EITC was increased from 23 cents to 34 cents (25 cents to 40 cents for two plus children). The Earned Income Tax Credit (EITC) a policy that promotes work for low- to moderate-income households by providing them with a refundable tax credit used to supplement their wages and help offset the effect of Social Security taxes. That is, you need to actually work to receive the benefits. You can read more about it here <https://www.investopedia.com/terms/e/earnedincomecredit.asp> and many other places, it's a widely discussed policy. So, it's easy to imagine this policy will increase the number of single mothers returning to work (treatment group), while the behavior of single women with no dependents will largely remain unchanged (control group). 
+
+The question is, does the EITC help single mothers get back to work? Let's find out!
+
+To get started will have to create our $After_t$ and $Treated_i$ variables. The post-treatment period will be all years after 1993 and our treatment group will contain all single mothers over this period of time in the data set.
+
+```{r}
+
+dfeitc <- dfeitc %>% mutate(after = year >= 1994, # create post-treatment period variable
+                            treated = children > 0) # create treatment group variable 
+summary(dfeitc)
+
+```
+
+Our dependent variable will be "work", which is a dummy equal to one if the person is working and zero otherwise. To estimate the effect of the EITC expansion we can simply run OLS!
+
+```{r}
+
+DID0 <- lm(work ~ after*treated, data = dfeitc)
+
+export_summs(DID0,digits = 3 , stars = c(`***` = 0.01, `**` = 0.05, `*` = 0.1))
+
+```
+
+But wait, we don't have standard errors clustered at the group level. Let's fix this by estimating the second equation in the previous subsection using `fixest` package. 
+
+```{r}
+
+dfeitc <- dfeitc %>% mutate(Treated1 = children >0 & year >= 1994) # create alternative treatment variable. Could have also been Treated1 = treated*after.
+
+DID1 <- feols(work ~ Treated1 | treated + after, dfeitc)
+export_summs(DID0, DID1, digits = 3, model.names = c("DID w Bad S.E.'s", "DID w Good S.E.'s"), statistics = c(N = "nobs", R2 = "r.squared"), stars = c(`***` = 0.01, `**` = 0.05, `*` = 0.1) )
+
+```
+According to our estimates, the EITC expansion increased the probability of working by 4.7 percentage points and the effect is significant. 
+
+**WARNING**: we don't have time to discuss the parallel trends assumption, which is the main assumption required to argue that we are truly recovering the causal treatment effect of interest, but I would say this assumption is likely violated in more applications than it isn't. To make matters worse, there is no way to test whether this assumption holds. So, make sure you understand your data, what you are trying to measure, and have arguments prepared for why this assumption holds in your context. 
+
+
+# Event studies
+
+Event studies are a lot like `Difference-in-Differences` except there is usually only one person or unit that's tracked over multiple time periods, i.e., time series. The main idea behind event studies is that some kind of event occurs, which puts a treatment into effect that allows us to compare what happened before the event to after the event. This only really works if the treatment is the only that has changed. We can't have the outcome of interest changing for some reason unrelated to the treatment, otherwise everything falls apart. In practice, we don't know what would have happened if the treatment hadn't occurred, so we are stuck with making predictions. This often means researchers have to extrapolate using data prior to the event occurring to predict what would of happened if the treatment never came in to effect. Then, they compare that prediction to what actually happened to estimate the size of the treatment effect. 
+
+This Section will borrow the event study examples found in Nick Huntington-Klein's book titled, "**The Effect**", which he has made freely available here <https://theeffectbook.net/>. 
+
+## Event studies in practice
+
+On August 10, 2015, Google announced that there would be major corporate structural changes made to the company. Specifically, a new parent company called “Alphabet” would own Google along with all that other stuff previously affiliated with Google like FitBit and Nest. To do an event study, we'll follow four basic steps:
+
+1. pick an estimation period far in advance of the event and also an observation period, which will cover just before and after the event. In our finance example, it will be several months before and after the announcement was made. 
+2. Using data from the estimation period, we'll predict the outcome of interest, which was Google' stock return. We can do this by taking the average of Google's return in the estimation (**means-adjusted returns model**). Alternatively, we could also use what is known as the **markets-adjusted returns** model to predict the stock returns or the **risk-adjusted returns** model, which involves fitting a regression on the estimation period data where the outcome is Google's daily stock return and the independent variable is the daily market return, then use that model in the observation period to predict Google's stock return. I'll do all three methods below.
+3. In the observation period, we'll subtract the prediction from the actual return, which will give us the "abnormal return (AR)"
+4. Look at the AR in the observation period. If the AR is non-zero before the event, then the market may have anticipated the event. If the the AR is non-zero after the event, then that will tell us about the effect of the event on Google's daily stock return. 
+
+With these steps in hand, let's read in our data financial data. 
+
+```{r}
+library(lubridate)
+library(ggplot2)
+
+goog <- causaldata::google_stock
+
+event <- ymd("2015-08-10") # date of our event (Google's corporate restructing announcement)
+
+# Create estimation data set. We will use this to generate our predicted stock return for Google
+est_data <- goog %>%
+ filter(Date >= ymd('2015-05-01') &
+ Date <= ymd('2015-07-31'))
+
+# And observation data
+obs_data <- goog %>%
+ filter(Date >= event - days(4) & 
+ Date <= event + days(14))
+
+# Estimate a model predicting stock price with market return. Here we will use the SP500 returns as a proxy for stock market return. This is needed for step 2.
+m <- lm(Google_Return ~ SP500_Return, data = est_data)
+
+# Compute abnormal return (AR): 3 different ways
+obs_data <- obs_data %>%
+ # 1. Using mean of estimation return
+ mutate(AR_mean = Google_Return - mean(est_data$Google_Return),
+ # 2. Then comparing to market return
+ AR_market = Google_Return - SP500_Return,
+ # 3. Then using model fit with estimation data
+ risk_predict = predict(m, newdata = obs_data),
+ AR_risk = Google_Return - risk_predict)
+
+# Graphing all the results
+ggplot(obs_data, aes(x = Date, y = AR_mean)) + 
+ geom_line() + 
+ geom_vline(aes(xintercept = event), linetype = 'dashed') + 
+ geom_hline(aes(yintercept = 0))
+
+ggplot(obs_data, aes(x = Date, y = AR_market)) + 
+ geom_line() + 
+ geom_vline(aes(xintercept = event), linetype = 'dashed') + 
+ geom_hline(aes(yintercept = 0))
+
+ggplot(obs_data, aes(x = Date, y = AR_risk)) + 
+ geom_line() + 
+ geom_vline(aes(xintercept = event), linetype = 'dashed') + 
+ geom_hline(aes(yintercept = 0))
+
+```
+
+The figures suggests there is not a whole lot of action prior to Google's announcement but there is a large spike in daily stock returns directly after the announcement is made, which is interesting! The former observation suggests this move was not anticipated by the market. Moreover, the effect of the announcement does not appear to last very long as Google's daily market returns fall back down towards zero on August 12. Importantly, given how much can happen in a week in the stock market, I would not attribute the effects shown later on int he figure to be related to Google's corporate restructuring announcement. So, keep the observation window small when doing these exercises. 
+
+For further examples on event studies and other things to consider when implementing them, you can check out the help page of the **estudy2** package in R. 
+
+# Discrete variable models
+
+In this section I will discuss non-linear binary response models (e.g., logit and probit), as well as ordinal response models (e.g., dependent variable is categorical with ordered categories), and then conclude by briefly going over models of censoring, truncation, and selection. I will briefly discuss how to estimate the models, interpret the coefficients, compute predictions, and compute marginal effects. Since this is such a big topic I will try to keep the examples as brief as possible in the interest time. 
+
+The examples covered in this section are based on several different sources that can be accessed via these links: <https://sites.google.com/site/econometricsacademy/econometrics-models/probit-and-logit-models>, <https://scpoecon.github.io/ScPoEconometrics/binary.html>, <https://www.princeton.edu/~otorres/LogitR101.pdf>, <https://vincentarelbundock.github.io/marginaleffects/>, <https://sites.google.com/site/econometricsacademy/econometrics-models/multinomial-probit-and-logit-models>, and <https://sites.google.com/site/econometricsacademy/econometrics-models/ordered-probit-and-logit-models>.
+
+## Binary response models
+
+Binary outcome models estimate the probability that our outcome variable, $y$, equals one, conditional on a vector x of predictor variables. Specifically, we are interested in estimating
+\begin{aligned}
+  E(Y | X) = Pr(Y=1|X) = F(\beta_0 + \beta_1 X), \ Y \in \{0,1\}
+\end{aligned}
+where $F(\cdot)$ is some function that maps any $z \in \mathbb{R}$ into a $(0,1)$ interval, which addresses the deficiencies that accompany the linear probability model. The most common functional forms you'll see used in economics are the Probit and Logit models, which are displayed in the below plot
+
+```{r}
+library(ggplot2)
+ggplot(data.frame(x = c(-5,5)), aes(x=x)) + 
+  stat_function(fun = pnorm, aes(colour = "Probit")) + 
+  stat_function(fun = plogis, aes(colour = "Logit")) + 
+  theme_bw() + 
+  scale_colour_manual(name = "Function G",values = c("red", "blue")) +
+  scale_y_continuous(name = "Pr(y = 1 | x)")
+```
+
+As you can see, higher values of x are associated with a higher probability that the outcome variable equals one. You'll also notice that *changes* in the probability will be much larger when say x goes from zero to one, than if x goes from 4 to 5. Last, no matter the value of x, the probability of success always falls in the $(0,1)$ interval. 
+
+Now let's read in some data from David Card (1995), "Using Geographic Variation in College Proximity to Estimate the Return to Schooling" to see how these models work in practice. This data set contains 3010 individuals with 34 variables. The variables in the data set contain mostly information about demographic and labour market characteristics of workers. So, we have information about the individuals wages, years of job experience, school enrollment decisions, age, gender, race, etc. For our example, we will be trying to predict whether workers enrolled in college in 1976.
+
+```{r message=FALSE}
+
+library(wooldridge) # for data
+library(marginaleffects) # for adjusted predictions and marginal effects later
+library(jtools) # tools for summarizing output
+library(huxtable) # tools for summarizing output
+library(dplyr) # for data cleaning/manipulation
+library(ggplot2) # for plots
+library(fixest) # for probit and logit --- feglm()
+
+data("card",package = "wooldridge")
+help(card) # lists all variables and provides a bried description of the data set
+
+summary(card)
+
+```
+
+The variables we will include in our vector of controls for this exercise are:
+
+- nearc2: =1 if near 2 yr college, 1966
+- nearc4: =1 if near 4 yr college, 1966
+- fatheduc: father's schooling
+- motheduc: mother's schooling
+- IQ: IQ score
+
+To estimate Probit and Logit regressions we can leverage the **fixest** package again and use the `feglm()` command, which will also allow us to easily cluster our standard errors if needed, include instrumental variables, include fixed effects (this can be tricky, so be careful), and it's also just really fast. Or, we can simply use the `glm()` function that comes with the installed with the base R packages. Either will work. I will use `glm()` since it's a bit more functional with the **marginaleffects** package. Let's see how this works below
+```{r message = FALSE}
+
+probit <- glm(enroll ~ factor(nearc2) + factor(nearc4) + fatheduc + motheduc + IQ, 
+              data = card, 
+              family = binomial(link = 'probit'))
+logit  <- glm(enroll ~ factor(nearc2) + factor(nearc4) + fatheduc + motheduc  + IQ, 
+              data = card, 
+              family = binomial(link = 'logit'))
+
+export_summs(probit,logit,
+             model.names = c("Probit", "Logit"),
+             digits = 3 , stars = c(`***` = 0.01, `**` = 0.05, `*` = 0.1), 
+             statistics = c(N = "nobs", BIC = "BIC") )
+             
+```
+
+When interpreting the coefficients from these regressions you should keep in mind that a one-unit change in $X$ is the effect on the *index*, not our outcome $Y$ directly. Moreover, the coefficients can only tell us about the direction and significance of the regressor. For example, all else equal, individuals who lived near four year colleges in 1966 (nearc4=1) are more likely to be enrolled in school in 1976 relative to those who did not live near a four year college in 1966, and this effect is significant at the 5 percent level. All else equal, we can also see that individuals with higher IQ scores are more likely to enroll in college in 1976 and it's significant at the ten percent level. Moreover, the signs and significance of the coefficients are the same in both the Logit and Probit models. This will generally be the case for the majority of applications, so it doesn't really matter which model you choose to use for your projects. It really boils down to preference. I think a lot of people like the logit model because there is a closed form solution for the link function, which makes calculating marginal effects and predicted probabilities really easy. As a last note, if for some reason you were interested in comparing the magnitudes of the coefficients from the Probit and Logit models, you would simply multiply the Probit coefficients by 1.6.
+
+Okay, now that we have a rough understanding of how to interpret the coefficients from these models, let's think about how to calculate what we are really interested in, which is, *what is the effect of a one-unit increase (or an instantaneous change) in $X$ on $Y=1$*? To answer this question, we'll need to compute the marginal effects. As I've alluded to in the earlier figure in this subsection, the marginal effect is going to heavily depend on how far $X$ is to the left or right in the figure. In essence, there is no *one* marginal effect, the effects will largely depend on how you treat the other regressors in the model, e.g., are you going to hold the other variables at their means or are you going to assign values to each of them? In general, there are four ways people compute marginal effects and this applies to all models covered in this entire section:
+
+1. **The Marginal Effect of a Representative (MER)**: assign a value or set of values to the right-hand-side variables you're interested in and calculate the marginal effect for them. For example, imagine we included an IQ-nearc4 interaction term in our regression, what is the marginal effect of living near a four year college on the probability of enrolling in college in 1976 at different levels of IQ, say 100, 150, and 200? 
+2. **The Average Marginal Effect (AME)**: calculate the marginal effect for each unit-level observation in your data set and take the average
+3. **Marginal Effect at the Mean (MEM)**: calculate the marginal effect while holding each variable in the regression at their mean values
+4. Summarize the entire distribution: similar to AME, calculate the marginal effect for each unit-level observation and then present the entire distribution
+
+Before I show you how to compute the marginal effects, one other thing to consider when interpreting the effects is whether or not the variable of interest is continuous or discrete. If you are computing the marginal effect of a continuous variable on the outcome, the marginal effect applies to a very small change (or instantaneous change) in $X$, **not** a one-unit change in $X$. This is basically because our link function is non-linear, which means our marginal effects will be non-linear. If you are working with a discrete variable things become much easier to work with. For example, the effect of living near a four year college on the probability of enrolling in college would simply be the change from going from 0 (not living near 4 year college) to 1 (living near for year college). Hopefully, that makes sense. In any case, just be careful.
+
+Now, let's obtain some marginal effects using the **marginaleffects** package:
+
+```{r warning=FALSE}
+
+# Average Marginal Effects (AME)
+mfxprob_ame <- marginaleffects(probit) # computes a dataframe of marginal effects using probit coefficients
+mfxlog_ame <- marginaleffects(logit)
+
+head(mfxprob_ame) # as you can see, it computes the marginal effect for each of our true x's using the probit coefficients 
+
+# Marginal Effects at Means (MEM)
+mfxprob_mem <- marginaleffects(probit,newdata = datagrid()) # "newdata = datagrid()" tells marginaleffects to hold all variables at their mean
+mfxlog_mem <- marginaleffects(logit,newdata = datagrid())
+
+head(mfxprob_mem) # as you can see, it computes the marginal effect for each of the average x's using the probit coefficients
+
+# Marginal Effects at Representative values (MER)
+mfxlog_mer <- marginaleffects(logit ,
+                newdata = datagrid(IQ = 500, model = logit)) # let's make every single person a genius in the model and leave everything else unchanged
+mfxprob_mer <- marginaleffects(probit,
+                newdata = datagrid(IQ = 500, model = probit)) # let's make every single person a genius in the model and leave everything else unchanged
+
+head(mfxlog_mer) # check that IQ=500 for everyone
+
+ # AME's displayed under estimate column
+summary(mfxprob_ame)
+ # AME's displayed under estimate column
+summary(mfxlog_ame)
+
+# Marginal Effects all in a single table
+export_summs(mfxlog_ame, mfxlog_mem,mfxlog_mer,mfxprob_ame,mfxprob_mem, mfxprob_mer,
+             model.names = c("AME's Logit", "MEM's Logit","MER's Logit", "AME's Probit","MEM's Probit", "MER's Probit"),
+             digits=3,
+             statistics = NULL,
+             stars = c(`***` = 0.01, `**` = 0.05, `*` = 0.1))
+
+```
+
+The **marginaleffects** function produces distinct estimates of the marginal effect for each row of the data used to fit the model. Further, it will compute the marginal effect for each coefficient in our model. Once it finishes, the results are saved in a data frame that can be analyzed with basic commands in `R`. To obtain the **Average Marginal Effects** we can simply apply the `summary()` command on the new data frame (e.g., mfxprob_ame) that contains the row level marginal effects, which will provide us with the point estimates of the AME's, confidence intervals, and significance levels. As we can see, the instantaneous effect of IQ on the probability of enrolling in college is about 0.001 percentage points, while the marginal effect of living near a four year college increases the probability of enrollment by about 4 percentage points. Overall, the AME's and MEM's are about the same magnitude and are all the same sign, as expected. 
+
+What if we had interactions in our model and want to plot out the effects conditional on some other variable? Let's add interactions to our logit model to test out what happens!
+```{r warning=FALSE}
+
+logit_int  <- glm(enroll ~ factor(nearc2) + factor(nearc4) + IQ*(fatheduc + motheduc)  , 
+              data = card, 
+              family = binomial(link = 'logit'))
+
+plot_cme(logit_int, effect = "IQ", condition = "fatheduc")
+
+```
+
+This figure shows us how the marginal effect of IQ on the probability of college enrollment changes with years of fathers education. Specifically, we can see the marginal effect of IQ on the probability of college enrollment increases with fathers education but the effect is never statistically significant at conventional levels. It is a conditional marginal effects plot. 
+
+## Ordinal response models
+
+If your dependent variable has more than two categories and the categories have a distinct ordering, then you'll want to use an Ordered Probit or Logit model. For example, imagine our dependent variable had four categories that described how worker's skills have changed over a two year period. The possible responses are, "decrease = 0", "no change = 1", "small increase = 2", and "large increase = 3". Clearly, there is an obvious ranking in this variable where "large increase = 3" is the largest (or ranked first) and "decrease = 0" is the smallest (or would be ranked last). Other examples of ordered categorical variables include things related to rating systems (poor, fair, good, excellent), opinion surveys (strongly agree, agree, neutral, disagree, strongly disagree), grades (A,B,C,D), and employment (unemployed, part time, full time). 
+
+Going back to our skill variable example, even though there is a distinct ranking in the variable, the difference between going from skill decrease to no change may not be the same as going from small increase to large increase. So, we use the Ordered Probit or Logit models to estimate different cutoffs that would basically tell us when a respondent would report each category. That is, the Ordered Probit and Logit models are index models for a single latent variable that we'll call $y^*_i$,
+\begin{aligned}
+  y^*_i = X' \beta + u_i, \\
+  y_i = j \ \text{if} \ \kappa_{j-1} < y^*_i \leq \kappa_j,
+\end{aligned}
+where $\kappa_j$ are the estimated thresholds and $y_i$ is the observed categorical response. Then, the probability that person $i$ will select alternative $j$ is
+\begin{aligned}
+
+Pr(y_i = j | X) = Pr(\kappa_{j-1} < y^*_i \leq \kappa_j | X) = F(\kappa_j - X'\beta) - F(\kappa_{j-1} - X'\beta),
+
+\end{aligned}
+where $F(\cdot)$ is the Logistic CDF in the Ordered Logit model and the standard Normal CDF for the Ordered Probit model. 
+
+When estimating these models for a dependent variable with $j$ alternative, there will be estimates for all coefficients and $j-1$ intercepts reported. The only thing that the sign of the coefficients in the regression output tells you is whether the latent variable $y^*_i$ is increasing with the regressor.
+
+Okay, now let's get into our example. This example is from Econometrics Academy, which can be accessed via this link <https://sites.google.com/site/econometricsacademy/econometrics-models/ordered-probit-and-logit-models>.
+```{r message=FALSE}
+
+library(MASS) # for ordered probit and logit --- polr()# marginal effects and predictions
+library(jtools) # nice tables
+
+healthdata <- read.csv("/home/tommas/DDrive/Dropbox/ECON_4400_GTA_202122/R_files/ordered_health.csv",header=TRUE)
+
+healthdata <- healthdata %>% mutate(hs1 = as.factor(healthstatus1),
+                                    agegroup = ifelse(age <= 25,0,
+                                                      ifelse(age > 25 & age <= 40,1,
+                                                             ifelse(age >40,2,NA))) # categorize the age variable for example below
+                                    )
+
+
+head(healthdata)
+summary(healthdata)
+
+```
+Our dependent variable in this exercise will be health status (hs1) and our regressors will be age, log income, and number of diseases. Let's get started
+
+```{r warning=FALSE}
+
+ologit <- polr(hs1 ~ age + numberdiseases + logincome, data=healthdata, Hess=TRUE)
+oprobit <- polr(hs1 ~ age + numberdiseases + logincome, data=healthdata, Hess=TRUE, method = "probit")
+
+export_summs(ologit,oprobit,  
+             model.names = c("Ordered Logit","Ordered Probit"),
+             digits=3,
+             stars = c(`***` = 0.01, `**` = 0.05, `*` = 0.1),
+             statistics = c(N = "nobs", BIC = "BIC") )
+
+```
+Now for some strange reason the stars are not showing up on the coefficients in the regression table, but by looking at the standards errors and computing the 95% C.I. for each coefficient you can easily see that they are all statistically significant. In both the Ordered Logit and Probit models, we can see that older individuals are less likely to report they're in excellent health, individuals with higher numbers of diseases are less likely to report they're in excellent health, and workers with higher levels of income are more likely to report they're in excellent health. We can also see the cutoffs are significant, which suggests we should not combine categories in the dependent variable. 
+
+Unfortunately, this is the only package I could find that worked with these models. It doesn't work well with categorical variables but does obtain the correct results for continuous and binary variables. Each row should approximately sum to zero, I say approximately because there is some minor rounding error. If someone is aware of a package that is more flexible than the one I'm using please let me know.
+
+```{r warning=FALSE}
+
+library(erer) # for marginal effects in ordinal response models
+
+# AME's
+mfxolog <- ocME(ologit)
+mfxoprob <- ocME(oprobit)
+
+print(mfxolog)
+print(mfxoprob)
+
+```
+
+## Limited dependent variable models
+
+This subsection will cover Tobit, Truncated regression, and Heckman Selection models. The code and examples were lifted from <https://sites.google.com/site/econometricsacademy/econometrics-models/limited-dependent-variable-models>.
+
+We use limited dependent variable models when our dependent variables have some kind of limit or boundary and many observations are hitting this limit or boundary. A common example used in labour economics is Labour the labor supply (hours worked) by women with some women choosing not to work (zero hours) and others choosing to work a positive number of hours. What is censoring and truncation?
+
+- **Censored Sample** --- when we observe observations in the sample at this limit or boundary (our sample contains women with zero hours of work and positive hours of work)
+- **Truncated Sample** --- we are missing observations in the sample, e.g., we only observe workers with positive hours worked and therefore do not observe anything about workers who choose not work $\implies$ much greater loss of information
+
+Both situations lead to bias.
+
+In the example we are covering today, we want to study the factors influencing ambulatory expenditures. The data are from the 2001 Medical Expenditure Panel Survey (2001). Overall, there are 3328 observations in the data set. Our dependent variable is going to be ambulatory expenditures and has 526 zero observations. The variables included in our vector of controls will be age, female, and total number of chronic conditions. Let's start by summarizing our data.
+
+```{r message=FALSE}
+
+# install.packages("VGAM")
+library(VGAM)
+# install.packages("AER")
+library(AER)
+# install.packages("truncreg")
+library(truncreg)
+# install.packages("censReg")
+library(censReg)
+
+mydata<- read.csv("/home/tommas/DDrive/Downloads/limdep_ambexp.csv")
+attach(mydata)
+
+# Define variables
+Y <- cbind(ambexp)
+X <- cbind(age, female, totchr)
+
+# Descriptive statistics
+summary(Y)
+summary(X)
+```
+
+
+Now let's look at how to estimate our Tobit regressions in using two different packages. Both should be equivalent.  We'll start by using `tobit()` and then estimate the same equation using `censReg()`. In general, you need to specify values for the upper and lower boundary, i.e., the values are associated with censoring, in our example it is zero. Unfortunately, our `export_summs()` does not work with these packages so we'll be stuck summarizing the results with `stargazer()`. Remember, if we just tried to estimate this regression using OLS we would not be accounting for the systematic or non-random selection into the censored group and would obtain biased result.
+```{r warning=FALSE}
+
+library(stargazer)
+# Tobit model coefficients (censoring from below at 0 or left censored)
+tobit1 <- tobit(Y ~ X, left=0, right=Inf, data=mydata) # tobit(formula, left = boundary below (-Inf if no boundary), right = boundary above (=Inf if no boundary), data)
+tobit2 <- censReg(Y ~ X, left=0, right=Inf, data=mydata)
+stargazer(tobit1,tobit2,type= 'text')
+
+# Tobit model marginal effects for the censored sample
+summary(margEff(tobit2))
+
+```
+
+From the Tobit output we can say that individuals who are older, female, or have more chronic conditions have higher latent ambulatory expenditures. A one-unit increase in an individual's age would suggest they have an additional \$333 in "desired" or latent ambulatory expenditures. The marginal effects from the censored sample tell us that if an individual becomes one year older we can expect they have an additional \$220 in actual ambulatory expenditures.
+
+```{r warning=FALSE}
+
+# Heckman model: two ways to get the exact same results 
+# install.packages("sampleSelection")
+library(sampleSelection) 
+heckman1 <- heckit(selection = (Y>0) ~ X, outcome = Y ~ X, method = "ml") 
+#summary(heckman1) it's the exact same so uncomment to check for yourself
+
+heckman2 <- selection((Y>0) ~ X, Y ~ X, data = mydata) 
+summary(heckman2) 
+
+```
+
+From the Probit coefficients in the Heckman output we can say that individuals who are older, female, or have more
+chronic conditions are more likely to have positive ambulatory expenditures. We can see in the outcome equation for the truncated sample that a one unit increase in age is associated with \$350 more in ambulatory expenditures. Moreover, the results are similar to what we found in the Tobit regressions. 
+
+# Dynamic panel data models
+
+This is example was taken from Professor Saunders **R for Economics** course found here <https://www.youtube.com/watch?v=-oaVYdViz-g&list=PLCzsA9hMKGoaSukVTfFzzTn38IcYSjSGq&index=4>.
+
+Since our $X$ variables contain the lags of our dependent variable, this is going to lead to an endogeneity problem, which means we'll need to use Fixed Effects or instrumental variables to correct this problem. Thus, our instrument set will be $Z$. That data we'll be using comes from the UK and it contains data on firms, wages, capital, etc. Employment will be a function of lagged employment, wages, capital, and output. The further lags of employment will be the actual instruments. We'll estimate the equation in several different ways: the first difference estimator, the index specified where we'll specify the exact fixed effects to used in estimation, the system estimator approach (see Charles's video for brief explanation), and an approach that reduces the number of instruments used.
+
+```{r message=FALSE}
+
+# Dynamic Panel GMM
+#    - data indexed by individual (i) and time (t)
+
+#  General GMM formula:  "Y(i,t) ~ X(i,t) | Z(i,t)" 
+#    Y - Dependent variable
+#    X - Endogenous variable; includes the lags of Y(i,t-1) for dynamics. this leads to an endoegneity issue with the errors
+#    Z - Instrument set
+
+
+#install.packages("plm")
+library(plm)
+
+# package sample data 
+data("EmplUK", package = "plm")
+summary(EmplUK)
+
+
+# breaking down the model:
+#   log(emp) ~ lag(log(emp), 1:2) + lag(log(wage), 0:1) + log(capital) + lag(log(output), 0:1) | lag(log(emp), 2:99)"
+#  
+#    Y(i,t) = log(emp)              ==> employment(i,t)
+#    X(i,t) = lag(log(emp), 1:2)    ==> Y(i,t-1) and Y(i,t-2)
+#             lag(log(wage), 0:1)   ==> wage(i,t) and wage(i,t-1)
+#             log(capital)          ==> capital(i,t)
+#             lag(log(output), 0:1) ==> output(i,t) and output(i,t-1)
+#    Z(i,t) = lag(log(emp), 2:99)   ==> Y(i,t-2), Y(i,t-3), ... , Y(i,t-99)
+
+
+# Arellano and Bond (1991) estimator -- difference estimator
+z1.AB <- pgmm(log(emp) ~ lag(log(emp), 1:2) + lag(log(wage), 0:1)
+           + log(capital) + lag(log(output), 0:1) | lag(log(emp), 2:99),
+           data = EmplUK, 
+           effect = "twoways", 
+           model = "twosteps")
+summary(z1.AB)
+
+#   index specified
+z1.ABindex <- pgmm(log(emp) ~ lag(log(emp), 1:2) + lag(log(wage), 0:1)
+                   + log(capital) + lag(log(output), 0:1) | lag(log(emp), 2:99),
+           data = EmplUK, 
+           effect = "twoways", 
+           index = c("firm","year"), 
+           model = "twosteps")
+summary(z1.ABindex)
+
+
+# Blundell and Bond (1998) estimator -- system estimator
+z1.BB <- pgmm(log(emp) ~ lag(log(emp), 1:2) + lag(log(wage), 0:1)
+           + log(capital) + lag(log(output), 0:1) | lag(log(emp), 2:99),
+           data = EmplUK, 
+           effect = "twoways", 
+           model = "twosteps", 
+           transformation = "ld")
+summary(z1.BB)
+
+
+#   reducing the number of instruments
+z1.BBsmall <- pgmm(log(emp) ~ lag(log(emp), 1:2) + lag(log(wage), 0:1)
+           + log(capital) + lag(log(output), 0:1) | lag(log(emp), 2:4),
+           data = EmplUK, 
+           effect = "twoways", 
+           model = "twosteps", 
+           transformation = "ld")
+summary(z1.BBsmall)
+
+
+```
+
+# Time series
+
+In this section, I'll cover more examples that I lifted from Profesor Saunder's **R for Economics** course. 
+
+## ARIMA
+
+You can view the video that accompanies this example here: <https://www.youtube.com/watch?v=SPHsoWKVtgo&list=PLCzsA9hMKGoaSukVTfFzzTn38IcYSjSGq&index=8>. Autoregressive moving average (ARMA) models combine both p autoregressive terms and q
+moving average terms, also called ARMA(p,q).
+
+```{r message=FALSE}
+
+#install.packages("forecast")
+library(forecast)
+
+# time series data
+data("WWWusage")
+summary(WWWusage)
+plot(WWWusage)
+
+# estimate ARIMA model
+# help(auto.arima)
+fit <- auto.arima(WWWusage)
+summary(fit)
+
+
+# Information criteria
+AIC(fit)
+BIC(fit)
+
+# forecast 
+#help(forecast)
+forecast(fit, h = 1)   #  1 period  ahead
+forecast(fit, h = 10)  # 10 periods ahead
+
+
+# fit with defined ARIMA(p,d,q) order
+fit2 <- Arima(WWWusage, order = c(1,1,1))
+summary(fit2)
+
+# ARIMA order taken from another model
+fit.order <- arimaorder(fit)
+fit2 <- Arima(WWWusage, order = fit.order)
+summary(fit2)
+
+# making a time series: cutting the data off at period 60 to test our model 
+WWWusage.60 <- WWWusage[1:60]
+class(WWWusage.60)
+WWWusage.60 <- ts(WWWusage.60)
+class(WWWusage.60)
+plot(WWWusage.60)
+
+# Subset estimation and forecast
+fit.60 <- auto.arima(WWWusage.60)
+arimaorder(fit.60)
+summary(fit.60)
+fcst.60 <- forecast(fit.60, h = 40)
+WWWusage.40 <- ts(WWWusage[61:100]) # generate the serties with 40 observations we dropped
+fcstvalues <- fcst.60$mean  # use model to forecast forty periods ahead
+
+# forecast errors
+fcst.error <- as.numeric(WWWusage.40) - as.numeric(fcstvalues)
+plot(fcst.error) # does well for the first 20 or so time periods but performs poorly thereafter.
+
+```
+
+
+## VAR
+
+The video that accompanies this example is here: <https://www.youtube.com/watch?v=Q-9YLQXA5J0&list=PLCzsA9hMKGoaSukVTfFzzTn38IcYSjSGq&index=9>
+```{r message=FALSE}
+
+
+#install.packages("vars")
+library(vars)
+
+data(Canada)
+summary(Canada)
+
+# VAR --- reduced-form model --- only lags
+summary(VAR(Canada, type = "none"))
+VAR(Canada, p = 1, type = "const")
+VAR(Canada, p = 1, type = "trend")
+summary(VAR(Canada, p = 1, type = "both"))
+
+VAR.const <- VAR(Canada, p = 1, type = "const")
+plot(VAR.const)
+
+# impulse response functions
+VAR.const.irf <- irf(VAR.const, impulse = "e",
+                  response = c("prod", "rw", "U"), boot = FALSE)
+plot(VAR.const.irf)
+
+
+
+# Structural VAR --- contemporaneous A matrix
+
+# Construct A matrix
+amat <- diag(4)    # identity matrix
+diag(amat) <- NA   # free parameters on diagonal
+amat[2, 1] <- NA   # prod <== e
+amat[4, 1] <- NA   # U <== e
+
+SVAR.const <- SVAR(x = VAR.const, estmethod = "scoring", Amat = amat, Bmat = NULL,
+                   max.iter = 100, maxls = 1000, conv.crit = 1.0e-8)
+summary(SVAR.const)
+
+
+# impulse response functions
+SVAR.const.irf <- irf(SVAR.const, impulse = "e",
+                      response = c("prod", "rw", "U"), boot = FALSE)
+plot(SVAR.const.irf)
+
+SVAR.const.irf <- irf(SVAR.const, impulse = "e",
+                      response = c("prod"), boot = FALSE, ci = 0.95)
+plot(SVAR.const.irf)
+
+
+```
+
+
+## ECM
+
+This example was taken from the **ecm** package manual. 
+
+```{r message=FALSE}
+
+library(ecm)
+
+#Use ecm to predict Wilshire 5000 index based on corporate profits, 
+#Federal Reserve funds rate, and unemployment rate.
+data(Wilshire)
+
+#Use 2015-12-01 and earlier data to build models
+trn <- Wilshire[Wilshire$date<='2015-12-01',]
+
+#Assume all predictors are needed in the equilibrium and transient terms of ecm.
+xeq <- xtr <- trn[c('CorpProfits', 'FedFundsRate', 'UnempRate')]
+model1 <- ecm(trn$Wilshire5000, xeq, xtr, includeIntercept=TRUE)
+
+#Assume CorpProfits and FedFundsRate are in the equilibrium term, 
+#UnempRate has only transient impacts.
+xeq <- trn[c('CorpProfits', 'FedFundsRate')]
+xtr <- trn['UnempRate']
+model2 <- ecm(trn$Wilshire5000, xeq, xtr, includeIntercept=TRUE)
+
+#From a strictly statistical standpoint, Wilshire data may not be stationary
+#and hence model1 and model2 may have heteroskedasticity in the residuals.
+#Let's check for that.
+lmtest::bptest(model1)
+lmtest::bptest(model2)
+#The Breush-Pagan tests suggest we should reject homoskedasticity in the residuals for both models.
+
+lmtest::bgtest(model1)
+lmtest::bgtest(model2)
+#The Breusch-Godfrey tests suggest we should reject that there is no serial correlation 
+#in the residuals.
+
+#Given the above issues, see adjusted std. errors and p-values for our models.
+lmtest::coeftest(model1, vcov=sandwich::NeweyWest)
+lmtest::coeftest(model2, vcov=sandwich::NeweyWest)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
